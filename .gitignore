@@ -1,0 +1,5 @@
+code_challenges.txt
+*.swp
+*.swo
+*.pyc
+*.o
