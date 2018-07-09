@@ -28,7 +28,7 @@ def decode(code):
 if __name__ == "__main__":
 	string = input()
 
-	if len(string) > 2 and string[:2] == "0b":
+	if len(string) > 1 and string[:2] == "0b":
 		print("".join(map(chr,map(decode,string[2:].split("11")[:-1]))))
 	else:
 		print("0b"+"".join(map(encode,map(ord,string))))
