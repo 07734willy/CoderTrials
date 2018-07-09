@@ -1,0 +1,30 @@
+###Background
+
+While the QWERTY keyboard is by far the most common keyboard layout, but it is not the only one. There are some keyboard layouts that are designed to be more efficient for typists in a particular language, making use of the fact that some characters or character combinations are more common than others (see [markov chain](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=2&cad=rja&uact=8&ved=0ahUKEwjv9-u7643cAhWj6YMKHUJACqYQFgg7MAE&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FMarkov_chain&usg=AOvVaw3Fjk4kXiE_IV39D8dG-_BP)). Spacing these characters apart across the keyboard optimally, keyboards such as the [dvorak keyboard](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=0ahUKEwiC25aG7I3cAhWG6YMKHUI4DjsQFghUMAA&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FDvorak_Simplified_Keyboard&usg=AOvVaw3um3ZtpgYo1wOA8yScq8kp) allow typists to become even faster.
+
+Your objective is to (roughly) approximate how long a sentence takes to type on each keyboard- [QWERTY](https://www.wikiwand.com/en/QWERTY) and [Dvorak](https://www.wikiwand.com/en/Dvorak_Simplified_Keyboard), under standard [touch typing](https://www.wikiwand.com/en/Touch_typing). We assume the following rules:
+
+* The base time between typing each character is 2 units.
+* The time between typing characters increases 1 unit if both keys are under the same hand (total 3).
+* The time between typing characters increases another 2 units if both keys are under the same finger (total 5).
+* Characters requiring a `shift` press take an additional 2 units.
+* The first letter always takes 0 units (we start timing after said keystroke)
+
+It would probably be reasonable to assume a unit to be approximately ~0.1sec however to keep things clean I'll keep things in general "units".
+
+###Input
+
+A sentence, of which you must calculate how many units of time it takes to type. For example:
+
+    The quick brown fox jumps over the lazy dog.
+
+###Output
+
+The time taken to type the sentence in *units*. For the above, it would be:
+
+    QWERTY: 111
+    Dvorak: 
+
+Which we get from:
+
+    0+2+2+2+4+2+3+2+2+2+4+2+2+2+2+2+4+2+2+2+2+5+3+3+2+2+4+2+3+3+2+4+2+2+2+4+2+5+2+2+4+2+2+2

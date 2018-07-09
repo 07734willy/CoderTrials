@@ -1,0 +1,33 @@
+[solve] collision in bloom filters
+
+[codegolf] approximate x ** x = k  to 4 digits
+
+[golf/solve] print side view of menger sponge
+
+[solve] typing speed (key finger difference)
+
+[solve] needles on a bull's eye
+
+[optimization] minimal sentence score evaluated as factorial sums
+
+[solve] needles crossing
+
+[optimization] distribution sort
+
+[codegolf] number to blocktext
+
+[solve/optimize] find smallest expression == value
+
+[solve/optimize] find smallest add/sub exponentiation chain
+
+[solve] minesweeper
+
+[solve] clocks circle offset
+
+[solve] 000111001000 clock freq
+
+[solve] make change by year
+
+[codegolf] alternating sort
+
+[optimization] pi in circle on number grid
