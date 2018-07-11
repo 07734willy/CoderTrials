@@ -1,0 +1,223 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdint.h>
+
+typedef struct {
+	uint32_t cols;
+	uint32_t rows;
+	uint32_t x;
+	uint32_t y;
+	uint8_t dir; //N:00 E:01 S:10 W:11
+	uint8_t* tiles;
+	uint32_t errors;
+} Board;
+
+Board* makeBoard(uint32_t cols, uint32_t rows, char** self, char** other) {
+	Board* board = malloc(sizeof(Board));
+	board->tiles = malloc(cols * rows * sizeof(uint8_t));
+	board->cols = cols;
+	board->rows = rows;
+	int i, j;
+	for (i = 0; i < rows; i++) {
+		//memcpy(tiles + size * i, strings[i], size);
+		for (j = 0; j < cols; j++) {
+			board->tiles[j + i * cols] =  (self[i][j] == '#');
+			board->tiles[j + i * cols] |= (self[i][j] != other[i][j]) << 1;
+			board->errors += self[i][j] != other[i][j];
+		}
+	}
+	return board;
+}
+
+Board* cloneBoard(Board* oldBoard) {
+	Board* newBoard = malloc(sizeof(Board));
+	memcpy(newBoard, oldBoard, sizeof(Board));
+	
+	newBoard->tiles = malloc(oldBoard->cols * oldBoard->rows * sizeof(uint8_t));
+	memcpy(newBoard->tiles, oldBoard->tiles, oldBoard->cols * oldBoard->rows * sizeof(uint8_t));
+	return newBoard;
+}
+
+int stepBoard(Board* board) {
+	uint8_t* tile = board->tiles + board->x + board->y * board->cols;
+	if (*tile & 1) {
+		board->dir = (board->dir + 1) & 3;
+	} else {
+		board->dir = (board->dir - 1) & 3;
+	}
+	switch (board->dir) {
+		case 0:
+			board->y = (board->y - 1 + board->rows) % board->rows;
+			break;
+		case 1:
+			board->x = (board->x + 1) % board->cols;
+			break;
+		case 2:
+			board->y = (board->y + 1) % board->rows;
+			break;
+		case 3:
+			board->x = (board->x - 1 + board->cols) % board->cols;
+			break;
+	}
+	*tile ^= 1;
+	board->errors += 1 - (*tile & 2);
+	*tile ^= 2;
+	return board->errors == 0;
+}
+int stepBackBoard(Board* board) {
+	switch (board->dir) {
+		case 0:
+			board->y = (board->y + 1) % board->rows;
+			break;
+		case 1:
+			board->x = (board->x - 1 + board->cols) % board->cols;
+			break;
+		case 2:
+			board->y = (board->y - 1 + board->rows) % board->rows;
+			break;
+		case 3:
+			board->x = (board->x + 1) % board->cols;
+			break;
+	}
+	uint8_t* tile = board->tiles + board->x + board->y * board->cols;
+	*tile ^= 1;
+	*tile ^= 2;
+	board->errors -= 1 - (*tile & 2);
+	if (*tile & 1) {
+		board->dir = (board->dir - 1) & 3;
+	} else {
+		board->dir = (board->dir + 1) & 3;
+	}
+	return board->errors == 0;
+}
+
+void printBoard(Board* board) {
+	int i, j;
+	for (i = 0; i < board->rows; i++) {
+		for (j = 0; j < board->cols; j++) {
+			if (board->tiles[j + board->cols * i] & 1) {
+				printf("#");
+			} else {
+				printf(".");
+			}
+		}
+		printf("\n");
+	}
+	printf("X: %u, Y: %u, Dir: %u, Err: %u\n", board->x, board->y, board->dir, board->errors);
+}
+
+int main(int argc, char** argv) {
+	char c;
+	scanf("%c", &c);
+	uint8_t dir = 0;
+	switch (c) {
+		case 'W': dir++;
+		case 'S': dir++;
+		case 'E': dir++;
+		default: break;
+	}
+
+	uint32_t x, y;
+	scanf("%u %u", &x, &y);
+	uint32_t size, cols, rows;
+	scanf("%u", &size);
+	rows = size;
+	cols = size + 1;
+
+	char** str1 = malloc(rows * sizeof(char*));
+	char** str2 = malloc(rows * sizeof(char*));
+	int i;
+	for (i = 0; i < rows; i++) {
+		str1[i] = calloc(cols + 1, sizeof(char));
+		scanf("%s", str1[i]);
+	}
+	for (i = 0; i < rows; i++) {
+		str2[i] = calloc(cols + 1, sizeof(char));
+		scanf("%s", str2[i]);
+	}
+	Board* board1 = makeBoard(cols, rows, str1, str2);
+	board1->x = x;
+	board1->y = y;
+	board1->dir = dir;
+
+	Board* board2 = cloneBoard(board1);
+	Board* goal = makeBoard(cols, rows, str2, str1);
+
+
+	/*
+	printBoard(board1);
+	printf("\n");
+	for (i = 0; i < 100000000; i++) {
+		stepBackBoard(board1);
+	}
+	printBoard(board1);
+	for (i = 0; i < 100000000; i++) {
+		stepBoard(board1);
+	}
+	printBoard(board1);
+	return 0;
+	*/
+
+	uint64_t count = 0;
+	if (board1->errors == 0) {
+		printf("%lu\n", count);
+		return 0;
+	}
+	count++;
+	while (1) {
+		if (stepBoard(board1)) {
+			printf("%lu\n", count);
+			return 0;
+		}
+		count++;
+	}
+	/*
+		if (count == 1000000) {
+			//uint8_t* tmp = goal->tiles;
+			//memcpy(goal, board1, sizeof(Board));
+			//goal->tiles = tmp;
+			//memcpy(goal->tiles, board1->tiles, cols * rows * sizeof(uint8_t));
+			goal = cloneBoard(board1);
+		}
+		
+		uint64_t j;
+		if (count >= 1000000) {
+			int match = 1;
+			for (j = 0; j < cols * rows; j++) {
+				if (board1->tiles[j] != goal->tiles[j]) {
+					match = 0;
+					break;
+				}
+			}
+			if (match && (goal->x == board1->x) && (goal->y == board1->y) && (goal->dir == board1->dir)) {
+				printf("MATCHED %lu\n", count);
+				//printBoard(board1);
+				printBoard(goal);
+			}
+		}
+		//printf("%u %u %u    ", goal->x, goal->y, goal->dir);
+	*/
+		/*uint64_t j;
+		int match = 1;
+		for (j = 0; j < size * size; j++) {
+			if (board1->tiles[j] != goal->tiles[j]) {
+				match = 0;
+				break;
+			}
+		}
+		if (match) {
+			printf("MATCHED\n");
+		}
+		match = 1;
+		for (j = 0; j < size * size; j++) {
+			if (board2->tiles[j] != goal->tiles[j]) {
+				match = 0;
+				break;
+			}
+		}
+		if (match) {
+			printf("MATCHED\n");
+		}*/
+	//}
+}

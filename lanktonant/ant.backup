@@ -1,0 +1,38 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sdtint.h>
+
+typedef struct {
+	uint8_t c_mask;
+	uint8_t r_idx;
+	uint8_t dir; //N:00 S:01 E:10 W:11
+	uint32_t* rows;
+	uint32_t mismatch;
+} Board;
+
+Board* makeBoard(uint8_t size, char** strings) {
+	Board* board = malloc(sizeof(Board));
+	board->rows = calloc(size * sizeof(uint32_t));
+
+	int i, j;
+	for (i = 0; i < size; i++) {
+		for (j = 0; j < size; j++) {
+			rows[i] |= (strings[i][j] == '#') << j;
+		}
+	}
+	return board;
+}
+
+Board* cloneBoard(uint8_t size, Board* oldBoard) {
+	Board* newBoard = malloc(sizzeof(Board));
+	memcpy(newBoard, oldBoard, sizeof(Board));
+	
+	newBoard->rows = calloc(size * sizeof(uint32_t));
+	memcpy(newBoard->rows, oldBoard->rows, size * sizeof(uint32_t));
+	return newBoard;
+}
+
+void stepBoard(uint8_t size, Board* board) {
+	if (boards->rows[board->r_idx] & c_mask
+}
