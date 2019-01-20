@@ -38,9 +38,10 @@ def run_solver(command, is_piped, stdin_queue):
                 process.stdin.flush()
             
             run_output = process.stdout.read().decode(sys.stdout.encoding)
-            test_cases.append((test_input, run_output))
-            if not is_piped:
-                print(":output:\n{}".format(run_output))
+            if not process.poll():
+                test_cases.append((test_input, run_output))
+                if not is_piped:
+                    print(":output:\n{}".format(run_output))
         
         # We can't prompt whether to keep going, because it'll get logged into
         # the test cases as well
@@ -56,9 +57,9 @@ def run_solver(command, is_piped, stdin_queue):
 def format_tests(test_cases):
     tests = []
     for test_input, test_output in test_cases:
-        text = "input_lines: {}\n".format(len(test_input))
+        text = "input_lines: {}\n".format(len(test_input.split("\n")))
         text += test_input
-        text += "\noutput_lines: {}\n".format(len(test_output))
+        text += "\noutput_lines: {}\n".format(len(test_output.split("\n")))
         text += test_output
         tests.append(text)
     return "\n".join(tests) + "\n"

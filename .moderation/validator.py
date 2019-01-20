@@ -1,7 +1,7 @@
 from __future__ import print_function
 from subprocess import PIPE, run, TimeoutExpired
 from time import time
-from argparse import ArguementParser
+from argparse import ArgumentParser
 import sys
 import os
 
@@ -9,7 +9,7 @@ version = (0, 0, 2)
 
 # This function parses one section of a test case,
 # from "xxxx_lines: N" to the Nth line after
-def parse_lines(lines, section):
+def parse_lines(lines, section, test_num):
     try:
         # Skip any empty lines (between sections) or lines that start with '#'
         while not lines[0] or lines[0].startswith("#"):
@@ -18,7 +18,7 @@ def parse_lines(lines, section):
         lines = lines[1:]
         return "\n".join(lines[:num]), lines[num:]
     except:
-        print("{}: error: Parsing error on test case {}. Expected \"{}_lines:\" followed by an integer, but received \"{}\".".format(sys.argv[0], len(test_cases), section, lines[0]))
+        print("{}: error: Parsing error on test case {}. Expected \"{}_lines:\" followed by an integer, but received \"{}\".".format(sys.argv[0], test_num, section, lines[0] if lines else ""))
         raise
 
 # This function reads all the test cases out of the text,
@@ -30,10 +30,11 @@ def parse_tests(text):
     # Parse individual tests from the text, one by one
     while any(lines):
         try:
-            test_input, lines = parse_lines(lines, "input")
-            test_output, lines = parse_lines(lines, "output")
+            test_input, lines = parse_lines(lines, "input", len(test_cases))
+            test_output, lines = parse_lines(lines, "output", len(test_cases))
             test_cases.append((test_input, test_output))
-        except:
+        except Exception as e:
+            print(e)
             return list()
     return test_cases
 
